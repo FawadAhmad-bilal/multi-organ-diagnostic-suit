@@ -13,19 +13,11 @@ from keras.applications.vgg16 import preprocess_input as vgg_preprocess
 
 from grad_cam import make_gradcam_heatmap, overlay_heatmap
 
-# ===========================================================================
 # 1) MODEL LOGIC — same as before, nothing here changes prediction behavior
-# ===========================================================================
 
 MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# last_conv_layer: the exact layer name Grad-CAM will hook into. These were
-# read directly out of each .keras file's config.json, so they're accurate
-# for chest / malaria / skin_cancer / vgg. The eye_prediction entry assumes
-# a standard ResNet50 top (same as chest_model) since that file was too
-# large to inspect here — confirm the layer name matches by running
-# `model.summary()` once and checking the last activation before the
-# GlobalAveragePooling2D layer; edit LAST_CONV_EYE below if it differs.
+
 LAST_CONV_EYE = "conv5_block3_out"
 
 MODEL_CONFIGS = {
@@ -116,9 +108,6 @@ def run_prediction(config, pil_img):
     }
 
 
-# ===========================================================================
-# 2) UI / PRESENTATION LAYER — everything below is purely visual
-# ===========================================================================
 
 # ---- EDIT THESE TWO LINES FOR THE FOOTER --------------------------------
 YOUR_NAME = "Fawad Ahmad"
