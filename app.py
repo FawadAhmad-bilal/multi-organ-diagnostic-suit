@@ -1,33 +1,3 @@
-"""
-Multi-Organ Diagnostic Suite
-============================
-Single Streamlit app that routes an uploaded image to the right one of your
-five trained models, shows the prediction + confidence, and overlays a
-Grad-CAM heatmap so a viewer can see WHERE the model looked.
-
-Run with:
-    streamlit run app.py
-
-Expected folder layout (adjust MODEL_DIR below if yours differs):
-    multi-organ-project/
-        app.py
-        grad_cam.py
-        chest_model.keras
-        malaria_model.keras
-        skin_cancer.keras
-        vgg_model.keras
-        eye_prediction.keras
-
--------------------------------------------------------------------------
-NOTE ON STRUCTURE
-This file is split into two clearly marked halves:
-  1) MODEL LOGIC  — config, loading, preprocessing, prediction. UNCHANGED
-     from the working version. Do not need to touch this when restyling.
-  2) UI / PRESENTATION LAYER — CSS + all st.* rendering calls. This is the
-     only half that changed. If you want to tweak colors, layout, or add
-     a new organ card, everything you need is down there.
--------------------------------------------------------------------------
-"""
 
 import os
 import numpy as np
@@ -39,6 +9,7 @@ from keras.applications.resnet50 import preprocess_input as resnet_preprocess
 from keras.applications.mobilenet_v2 import preprocess_input as mobilenet_preprocess
 from keras.applications.efficientnet import preprocess_input as efficientnet_preprocess
 from keras.applications.vgg16 import preprocess_input as vgg_preprocess
+
 
 from grad_cam import make_gradcam_heatmap, overlay_heatmap
 
@@ -451,19 +422,6 @@ def render_probability_bars(result, config):
     st.markdown(rows + "</div>", unsafe_allow_html=True)
 
 
-def render_disclaimer():
-    st.markdown(
-        """
-        <div class="disclaimer">
-            ⚠️ Student portfolio project demonstrating transfer learning and model
-            explainability. Not a certified medical device — not for real
-            diagnostic use.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def render_footer():
     st.markdown(
         f"""
@@ -515,7 +473,6 @@ def main():
     render_images(pil_img, overlaid_img, show_gradcam)
     render_result_card(result, config)
     render_probability_bars(result, config)
-    render_disclaimer()
     render_footer()
 
 
