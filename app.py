@@ -48,7 +48,13 @@ from grad_cam import make_gradcam_heatmap, overlay_heatmap
 
 MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 
-
+# last_conv_layer: the exact layer name Grad-CAM will hook into. These were
+# read directly out of each .keras file's config.json, so they're accurate
+# for chest / malaria / skin_cancer / vgg. The eye_prediction entry assumes
+# a standard ResNet50 top (same as chest_model) since that file was too
+# large to inspect here — confirm the layer name matches by running
+# `model.summary()` once and checking the last activation before the
+# GlobalAveragePooling2D layer; edit LAST_CONV_EYE below if it differs.
 LAST_CONV_EYE = "conv5_block3_out"
 
 MODEL_CONFIGS = {
@@ -111,7 +117,10 @@ def load_model(path):
 
 
 def preprocess_image(pil_img, img_size, preprocess_fn):
-
+    """Resize + apply the SAME preprocessing the model saw during training.
+    Returns both the model-ready batch and the plain 0-255 array used for
+    Grad-CAM's visual overlay (they must NOT be the same array — the overlay
+    needs raw pixel values, not ImageNet-normalized ones)."""
     resized = pil_img.convert("RGB").resize(img_size)
     raw_array = np.array(resized).astype("float32")
     batch = np.expand_dims(raw_array.copy(), axis=0)
@@ -141,7 +150,7 @@ def run_prediction(config, pil_img):
 # ===========================================================================
 
 # ---- EDIT THESE TWO LINES FOR THE FOOTER --------------------------------
-YOUR_NAME = "Fawad Ahmad Bilal"
+YOUR_NAME = "Fawad Ahmad"
 GITHUB_URL = "https://github.com/FawadAhmad-bilal"
 # --------------------------------------------------------------------------
 
@@ -169,9 +178,16 @@ html, body, [class*="css"]  { font-family: 'Inter', sans-serif; }
     color: var(--text);
 }
 
-/* Hide Streamlit's default chrome so the app doesn't look like a default demo */
-#MainMenu, footer, header[data-testid="stHeader"] { visibility: hidden; height: 0; }
-.block-container { padding-top: 2rem; padding-bottom: 3rem; max-width: 1150px; }
+/* Hide Streamlit's default chrome so the app doesn't look like a default demo.
+   IMPORTANT: the header must stay visible (not visibility:hidden) because
+   the sidebar's collapse/expand arrow lives inside it in current Streamlit
+   versions. Hiding the whole header hides that arrow too, with no way to
+   bring a collapsed sidebar back. Instead, make it blend into the page:
+   transparent background, no border, and hide only the hamburger menu icon
+   and the "Made with Streamlit" footer text specifically. */
+#MainMenu, footer { visibility: hidden; height: 0; }
+header[data-testid="stHeader"] { background: transparent; }
+.block-container { padding-top: 1rem; padding-bottom: 3rem; max-width: 1150px; }
 
 /* ---------------- Sidebar ---------------- */
 section[data-testid="stSidebar"] {
@@ -439,8 +455,9 @@ def render_disclaimer():
     st.markdown(
         """
         <div class="disclaimer">
-            Student portfolio project demonstrating transfer learning and model
-            explainability.
+            ⚠️ Student portfolio project demonstrating transfer learning and model
+            explainability. Not a certified medical device — not for real
+            diagnostic use.
         </div>
         """,
         unsafe_allow_html=True,
