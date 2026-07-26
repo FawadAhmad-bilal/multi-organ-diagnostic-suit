@@ -17,6 +17,8 @@ five different diagnostic tasks using transfer learning, and visualizes
 
 ---
 
+🔗 **[Live Demo](https://multi-organ-diagnostic-suit.streamlit.app)**
+
 ## 📸 Preview
 
 > _Add a screenshot or screen recording of the dashboard here once deployed
