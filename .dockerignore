@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.vscode/
+.git/
+.gitattributes
+.gitignore
+README.md
+CONCEPTS.md
